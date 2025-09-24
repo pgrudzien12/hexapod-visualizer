@@ -150,6 +150,36 @@ class HexapodDemo:
                         pass
             
             time.sleep(1.0 / 60.0)
+
+    def _simulate_idle(self):
+        """Simulate an idle stance: legs fixed at base attachment positions, all joint angles zero."""
+        print("Starting idle (standing) simulation...")
+        start_time = time.time()
+        # Choose a nominal body height (reuse body_height)
+        stance_height = -self.body_height
+        while self.running:
+            current_time = time.time() - start_time
+            fake_timestamp = int(current_time * 1_000_000)
+            for leg_id in range(6):
+                leg_config = self.config.get_leg_config(leg_id)
+                base_x, base_y, _ = leg_config.position
+                # Keep body_z constant
+                body_z = stance_height
+                # Zero joint angles (raw); offsets still applied in visualization
+                leg_data = LegData(
+                    leg_number=leg_id,
+                    timestamp=fake_timestamp,
+                    body_xyz=(base_x, base_y, body_z),
+                    leg_xyz=(0.0, 0.0, body_z),  # Simplified local coordinates
+                    leg_angles=(0.0, 0.0, 0.0),
+                    leg_config=leg_config
+                )
+                if self.visualizer:
+                    try:
+                        self.visualizer.data_queue.put_nowait(leg_data)
+                    except:
+                        pass
+            time.sleep(1.0 / 30.0)  # Lower rate sufficient for idle
     
     def start_demo(self, pattern: str = "tripod"):
         """Start the demo simulation."""
@@ -160,6 +190,8 @@ class HexapodDemo:
             target_func = self._simulate_tripod_gait
         elif pattern == "wave":
             target_func = self._simulate_wave_pattern
+        elif pattern == "idle":
+            target_func = self._simulate_idle
         else:
             print(f"Unknown pattern: {pattern}. Using tripod.")
             target_func = self._simulate_tripod_gait
@@ -207,11 +239,13 @@ def main():
         print("\nAvailable demo patterns:")
         print("1. tripod - Tripod gait walking pattern")
         print("2. wave   - Wave-like movement pattern")
+        print("3. idle   - Standing still (all joint angles zero)")
         
-        choice = input("Select pattern (1-2) or press Enter for tripod: ").strip()
-        
+        choice = input("Select pattern (1-3) or press Enter for tripod: ").strip()
         if choice == "2":
             pattern = "wave"
+        elif choice == "3":
+            pattern = "idle"
         else:
             pattern = "tripod"
         
