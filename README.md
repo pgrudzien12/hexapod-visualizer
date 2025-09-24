@@ -105,6 +105,9 @@ visualization:
   show_coordinates: true # Display coordinate axes
   show_joints: true     # Draw articulated joint chain
   show_joint_angles: true # Annotate joint angles (C/F/T)
+  show_joint_coords: false  # Annotate each joint endpoint (x,y,z)
+  show_target_coords: false # Annotate foot/target point (x,y,z)
+  show_leg_origin_coords: false # Annotate each leg attachment origin (x,y,z)
   colors:               # RGB colors (0-255)
     body: [100, 100, 100]
     legs: [50, 150, 200]

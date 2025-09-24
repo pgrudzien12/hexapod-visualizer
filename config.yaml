@@ -73,6 +73,9 @@ visualization:
   show_coordinates: true # Show coordinate system axes
   show_joints: true       # Show joints chain (coxa, femur, tibia)
   show_joint_angles: true # Annotate joint angles
+  show_joint_coords: true  # Annotate joint endpoints with (x,y,z)
+  show_target_coords: true # Annotate foot/target point with (x,y,z)
+  show_leg_origin_coords: true # Annotate leg origin attachment coordinates (x,y,z)
   
   # Colors (RGB values 0-255)
   colors:

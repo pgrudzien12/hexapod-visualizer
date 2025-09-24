@@ -167,7 +167,10 @@ class HexapodVisualizer:
             
         # Clear previous coordinate lines
         for line in self.coord_lines:
-            line.remove()
+            try:
+                line.remove()
+            except Exception:
+                pass
         self.coord_lines.clear()
         
         # Axis length
@@ -210,6 +213,10 @@ class HexapodVisualizer:
         self.joint_lines.clear()
         self.joint_points.clear()
         self.joint_texts.clear()
+        joint_coord_texts = []
+        target_coord_texts = []
+        origin_coord_texts = []
+        origin_arrow_artists = []
         
         # Draw each leg
         for i in range(6):
@@ -244,6 +251,44 @@ class HexapodVisualizer:
                 color='black', s=30, alpha=0.8
             )
             self.leg_points.append(point)
+
+            # Annotate leg origin (attachment) coordinates if enabled
+            if getattr(self.config.visualization, 'show_leg_origin_coords', False):
+                # Text label for origin coordinates
+                try:
+                    origin_coord_texts.append(
+                        self.ax.text(
+                            attach_pos[0], attach_pos[1], attach_pos[2] + 0.005,
+                            f"{attach_pos[0]:.3f},{attach_pos[1]:.3f},{attach_pos[2]:.3f}",
+                            fontsize=6, color='darkgreen'
+                        )
+                    )
+                except Exception:
+                    pass
+                # Small local coordinate frame arrows (projected X/Y in horizontal plane, Z up)
+                try:
+                    # Define a small scale relative to body size
+                    axis_scale = max(self.config.robot.body.length, self.config.robot.body.width) * 0.06
+                    rot = leg_config.rotation
+                    cosr, sinr = math.cos(rot), math.sin(rot)
+                    # Local forward (leg +X) arrow (use red)
+                    fx = attach_pos[0] + cosr * axis_scale
+                    fy = attach_pos[1] + sinr * axis_scale
+                    fz = attach_pos[2]
+                    forward_line = self.ax.plot3D([attach_pos[0], fx], [attach_pos[1], fy], [attach_pos[2], fz], color='red', linewidth=1.2, alpha=0.85)[0]
+                    # Side direction (local +Y) rotate forward by +90° in horizontal plane
+                    sx = attach_pos[0] + (-sinr) * axis_scale
+                    sy = attach_pos[1] + (cosr) * axis_scale
+                    sz = attach_pos[2]
+                    side_line = self.ax.plot3D([attach_pos[0], sx], [attach_pos[1], sy], [attach_pos[2], sz], color='green', linewidth=1.2, alpha=0.85)[0]
+                    # Up direction (local +Z) always world up
+                    ux = attach_pos[0]
+                    uy = attach_pos[1]
+                    uz = attach_pos[2] + axis_scale
+                    up_line = self.ax.plot3D([attach_pos[0], ux], [attach_pos[1], uy], [attach_pos[2], uz], color='blue', linewidth=1.2, alpha=0.85)[0]
+                    origin_arrow_artists.extend([forward_line, side_line, up_line])
+                except Exception:
+                    pass
 
             # Draw joint chain if enabled and link lengths available
             if getattr(self.config.visualization, 'show_joints', True):
@@ -316,17 +361,39 @@ class HexapodVisualizer:
                     self.joint_points.extend([jp_femur, jp_tibia])
 
                     # Annotate angles
-                    if getattr(self.config.visualization, 'show_joint_angles', True):
-                        try:
-                            y_off = 0.005
+                    try:
+                        y_off = 0.005
+                        if getattr(self.config.visualization, 'show_joint_angles', True):
                             if coxa_len > 0.0:
                                 txtc = self.ax.text(coxa_end[0], coxa_end[1], coxa_end[2]+y_off, f"C:{math.degrees(coxa_angle):.0f}°", fontsize=7, color='black')
                                 self.joint_texts.append(txtc)
                             txtf = self.ax.text(femur_end[0], femur_end[1], femur_end[2]+y_off, f"F:{math.degrees(femur_angle):.0f}°", fontsize=7, color='black')
                             txtt = self.ax.text(tibia_end[0], tibia_end[1], tibia_end[2]+y_off, f"T:{math.degrees(tibia_angle):.0f}°", fontsize=7, color='black')
                             self.joint_texts.extend([txtf, txtt])
-                        except Exception:
-                            pass
+                        # Annotate coordinates if enabled
+                        if getattr(self.config.visualization, 'show_joint_coords', False):
+                            fmt = lambda p: f"({p[0]:.3f},{p[1]:.3f},{p[2]:.3f})"
+                            if coxa_len > 0.0:
+                                joint_coord_texts.append(self.ax.text(coxa_end[0], coxa_end[1], coxa_end[2]-y_off, fmt(coxa_end), fontsize=6, color='dimgray'))
+                            joint_coord_texts.append(self.ax.text(femur_end[0], femur_end[1], femur_end[2]-y_off, fmt(femur_end), fontsize=6, color='dimgray'))
+                            joint_coord_texts.append(self.ax.text(tibia_end[0], tibia_end[1], tibia_end[2]-y_off, fmt(tibia_end), fontsize=6, color='dimgray'))
+                    except Exception:
+                        pass
+
+            # Target (foot) coordinate annotation
+            if getattr(self.config.visualization, 'show_target_coords', False) and i in self.state.leg_positions:
+                p = self.state.leg_positions[i]
+                try:
+                    target_coord_texts.append(self.ax.text(p[0], p[1], p[2]+0.01, f"{p[0]:.3f},{p[1]:.3f},{p[2]:.3f}", fontsize=6, color='navy'))
+                except Exception:
+                    pass
+
+        # Extend tracking lists so they can be removed next frame
+        self.joint_texts.extend(joint_coord_texts)
+        self.joint_texts.extend(target_coord_texts)
+        self.joint_texts.extend(origin_coord_texts)
+        # Track arrow artists for cleanup (reuse leg_lines to auto-clean next frame)
+        self.leg_lines.extend(origin_arrow_artists)
     
     def _update_plot(self, frame):
         """Update the 3D plot with current data."""

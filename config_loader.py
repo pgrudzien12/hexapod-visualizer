@@ -134,6 +134,9 @@ class VisualizationConfig(BaseModel):
     show_coordinates: bool = True
     show_joints: bool = True
     show_joint_angles: bool = True
+    show_joint_coords: bool = False  # Annotate each joint endpoint coordinates
+    show_target_coords: bool = False  # Annotate leg target (foot) coordinates
+    show_leg_origin_coords: bool = False  # Annotate each leg attachment origin
     colors: Dict[str, List[int]] = {
         "body": [100, 100, 100],
         "legs": [50, 150, 200], 
@@ -256,6 +259,9 @@ class ConfigLoader:
                 'show_coordinates': True,
                 'show_joints': True,
                 'show_joint_angles': True,
+                'show_joint_coords': False,
+                'show_target_coords': False,
+                'show_leg_origin_coords': False,
                 'colors': {
                     'body': [100, 100, 100],
                     'legs': [50, 150, 200],
