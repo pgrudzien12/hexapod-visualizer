@@ -10,6 +10,9 @@ robot:
     width: 0.15
   legs:
     0:
+      link_lengths:
+      - 0.05
+      - 0.11
       name: Left Front
       position:
       - 0.075
@@ -17,6 +20,9 @@ robot:
       - 0.0
       rotation: 0.7854
     1:
+      link_lengths:
+      - 0.05
+      - 0.11
       name: Left Middle
       position:
       - 0.0
@@ -24,6 +30,9 @@ robot:
       - 0.0
       rotation: 1.5708
     2:
+      link_lengths:
+      - 0.05
+      - 0.11
       name: Left Back
       position:
       - -0.075
@@ -31,6 +40,9 @@ robot:
       - 0.0
       rotation: 2.3562
     3:
+      link_lengths:
+      - 0.05
+      - 0.11
       name: Right Front
       position:
       - 0.075
@@ -38,6 +50,9 @@ robot:
       - 0.0
       rotation: -0.7854
     4:
+      link_lengths:
+      - 0.05
+      - 0.11
       name: Right Middle
       position:
       - 0.0
@@ -45,6 +60,9 @@ robot:
       - 0.0
       rotation: -1.5708
     5:
+      link_lengths:
+      - 0.05
+      - 0.11
       name: Right Back
       position:
       - -0.075
@@ -66,11 +84,17 @@ visualization:
     - 255
     - 0
     - 0
+    joints:
+    - 255
+    - 215
+    - 0
     legs:
     - 50
     - 150
     - 200
   show_body: true
   show_coordinates: true
+  show_joint_angles: true
+  show_joints: true
   show_legs: true
   update_rate: 60

@@ -22,32 +22,44 @@ robot:
       name: "Left Front"
       position: [0.075, 0.075, 0.0]      # [x, y, z] attachment point in body coordinates (meters)
       rotation: 0.7854                   # Rotation from body X-axis in radians (pi/4 = 45°)
+      link_lengths: [0.068, 0.088, 0.127]   # [coxa, femur, tibia] lengths in meters
+      joint_angle_offsets: [0.0, 0.5396943301595464, 1.0160719600939494]  # Offsets (coxa,femur,tibia)
       
     1:  # Left Middle  
       name: "Left Middle"
       position: [0.0, 0.085, 0.0]        # [x, y, z] attachment point in body coordinates (meters)
       rotation: 1.5708                   # Rotation from body X-axis in radians (pi/2 = 90°)
+      link_lengths: [0.068, 0.088, 0.127]
+      joint_angle_offsets: [0.0, 0.5396943301595464, 1.0160719600939494]
       
     2:  # Left Back
       name: "Left Back"
       position: [-0.075, 0.075, 0.0]     # [x, y, z] attachment point in body coordinates (meters)
       rotation: 2.3562                   # Rotation from body X-axis in radians (3*pi/4 = 135°)
+      link_lengths: [0.068, 0.088, 0.127]
+      joint_angle_offsets: [0.0, 0.5396943301595464, 1.0160719600939494]
 
     # Right side legs (3, 4, 5)  
     3:  # Right Front
       name: "Right Front"
       position: [0.075, -0.075, 0.0]     # [x, y, z] attachment point in body coordinates (meters)
       rotation: -0.7854                  # Rotation from body X-axis in radians (-pi/4 = -45°)
+      link_lengths: [0.068, 0.088, 0.127]
+      joint_angle_offsets: [0.0, 0.5396943301595464, 1.0160719600939494]
       
     4:  # Right Middle
       name: "Right Middle" 
       position: [0.0, -0.085, 0.0]       # [x, y, z] attachment point in body coordinates (meters)
       rotation: -1.5708                  # Rotation from body X-axis in radians (-pi/2 = -90°)
+      link_lengths: [0.068, 0.088, 0.127]
+      joint_angle_offsets: [0.0, 0.5396943301595464, 1.0160719600939494]
       
     5:  # Right Back
       name: "Right Back"
       position: [-0.075, -0.075, 0.0]    # [x, y, z] attachment point in body coordinates (meters)
       rotation: -2.3562                  # Rotation from body X-axis in radians (-3*pi/4 = -135°)
+      link_lengths: [0.068, 0.088, 0.127]
+      joint_angle_offsets: [0.0, 0.5396943301595464, 1.0160719600939494]
 
 # Visualization Settings
 visualization:
@@ -59,12 +71,15 @@ visualization:
   show_body: true       # Show robot body outline
   show_legs: true       # Show leg positions and orientations
   show_coordinates: true # Show coordinate system axes
+  show_joints: true       # Show joints chain (coxa, femur, tibia)
+  show_joint_angles: true # Annotate joint angles
   
   # Colors (RGB values 0-255)
   colors:
     body: [100, 100, 100]
     legs: [50, 150, 200]
     coordinates: [255, 0, 0]
+    joints: [255, 215, 0]
 
 # Data Processing Settings
 data:

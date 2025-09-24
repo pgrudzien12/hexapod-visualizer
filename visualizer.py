@@ -10,6 +10,7 @@ from matplotlib.animation import FuncAnimation
 import threading
 import queue
 import time
+import math
 from typing import Optional, List, Tuple, Dict
 from dataclasses import dataclass, field
 
@@ -60,6 +61,7 @@ class HexapodVisualizer:
         self.body_color = [c/255.0 for c in colors["body"]]
         self.leg_color = [c/255.0 for c in colors["legs"]]
         self.coord_color = [c/255.0 for c in colors["coordinates"]]
+        self.joint_color = [c/255.0 for c in colors.get("joints", [255,215,0])]
         
         # Initialize matplotlib figure and 3D axes
         self.fig = plt.figure(figsize=(12, 9))
@@ -73,6 +75,9 @@ class HexapodVisualizer:
         self.leg_lines = []
         self.leg_points = []
         self.coord_lines = []
+        self.joint_lines = []
+        self.joint_points = []
+        self.joint_texts = []
         
         # Threading
         self.serial_thread = None
@@ -192,6 +197,19 @@ class HexapodVisualizer:
             point.remove()
         self.leg_lines.clear()
         self.leg_points.clear()
+        # Clear joints
+        for line in self.joint_lines:
+            line.remove()
+        for pt in self.joint_points:
+            pt.remove()
+        for txt in self.joint_texts:
+            try:
+                txt.remove()
+            except Exception:
+                pass
+        self.joint_lines.clear()
+        self.joint_points.clear()
+        self.joint_texts.clear()
         
         # Draw each leg
         for i in range(6):
@@ -226,6 +244,89 @@ class HexapodVisualizer:
                 color='black', s=30, alpha=0.8
             )
             self.leg_points.append(point)
+
+            # Draw joint chain if enabled and link lengths available
+            if getattr(self.config.visualization, 'show_joints', True):
+                leg_cfg_model = self.config.robot.legs[i]
+                link_lengths = getattr(leg_cfg_model, 'link_lengths', None)
+                leg_angles = self.state.leg_angles.get(i)
+                if link_lengths and leg_angles:
+                    # Normalize link lengths: if 2 provided (legacy), treat as femur,tibia with zero-length coxa
+                    if len(link_lengths) == 2:
+                        coxa_len = 0.0
+                        femur_len, tibia_len = link_lengths
+                    else:
+                        coxa_len, femur_len, tibia_len = link_lengths[:3]
+
+                    # Apply calibrated offsets
+                    coxa_angle = leg_angles[0] + leg_cfg_model.joint_angle_offsets[0]
+                    femur_angle = leg_angles[1] + leg_cfg_model.joint_angle_offsets[1]
+                    tibia_angle = leg_angles[2] + leg_cfg_model.joint_angle_offsets[2]
+
+                    base_x, base_y, base_z = attach_pos
+                    rot = leg_cfg_model.rotation
+                    cosr, sinr = math.cos(rot), math.sin(rot)
+
+                    # Coxa rotates about body Z axis (yaw) giving horizontal displacement only
+                    # We rotate forward vector by coxa_angle within horizontal plane relative to nominal rotation.
+                    nominal_forward = (cosr, sinr, 0.0)
+                    # Effective horizontal direction after coxa yaw: rotate nominal forward by coxa_angle around Z
+                    cosc, sinc = math.cos(coxa_angle), math.sin(coxa_angle)
+                    dir_x = nominal_forward[0]*cosc - nominal_forward[1]*sinc
+                    dir_y = nominal_forward[0]*sinc + nominal_forward[1]*cosc
+                    dir_z = 0.0
+                    # Coxa end point
+                    coxa_end = (base_x + dir_x * coxa_len, base_y + dir_y * coxa_len, base_z)
+
+                    # Femur pitch: we approximate vertical plane defined by dir vector and Z
+                    femur_dx = femur_len * math.cos(femur_angle) * dir_x
+                    femur_dy = femur_len * math.cos(femur_angle) * dir_y
+                    femur_dz = femur_len * math.sin(femur_angle)
+                    femur_end = (coxa_end[0] + femur_dx, coxa_end[1] + femur_dy, coxa_end[2] + femur_dz)
+
+                    # Tibia relative from femur end with (femur + tibia) pitch
+                    total_pitch = femur_angle + tibia_angle
+                    tibia_dx = tibia_len * math.cos(total_pitch) * dir_x
+                    tibia_dy = tibia_len * math.cos(total_pitch) * dir_y
+                    tibia_dz = tibia_len * math.sin(total_pitch)
+                    tibia_end = (femur_end[0] + tibia_dx, femur_end[1] + tibia_dy, femur_end[2] + tibia_dz)
+
+                    # Draw segments
+                    if coxa_len > 0.0:
+                        seg_coxa = self.ax.plot3D(
+                            [base_x, coxa_end[0]], [base_y, coxa_end[1]], [base_z, coxa_end[2]],
+                            color=self.joint_color, linewidth=2, alpha=0.9
+                        )[0]
+                        self.joint_lines.append(seg_coxa)
+                    seg_femur = self.ax.plot3D(
+                        [coxa_end[0], femur_end[0]], [coxa_end[1], femur_end[1]], [coxa_end[2], femur_end[2]],
+                        color=self.joint_color, linewidth=2, alpha=0.9
+                    )[0]
+                    seg_tibia = self.ax.plot3D(
+                        [femur_end[0], tibia_end[0]], [femur_end[1], tibia_end[1]], [femur_end[2], tibia_end[2]],
+                        color=self.joint_color, linewidth=2, alpha=0.9
+                    )[0]
+                    self.joint_lines.extend([seg_femur, seg_tibia])
+                    # Joint points (exclude base attachment already drawn)
+                    if coxa_len > 0.0:
+                        jp_coxa = self.ax.scatter(coxa_end[0], coxa_end[1], coxa_end[2], color=self.joint_color, s=40, alpha=0.9)
+                        self.joint_points.append(jp_coxa)
+                    jp_femur = self.ax.scatter(femur_end[0], femur_end[1], femur_end[2], color=self.joint_color, s=40, alpha=0.9)
+                    jp_tibia = self.ax.scatter(tibia_end[0], tibia_end[1], tibia_end[2], color=self.joint_color, s=40, alpha=0.9)
+                    self.joint_points.extend([jp_femur, jp_tibia])
+
+                    # Annotate angles
+                    if getattr(self.config.visualization, 'show_joint_angles', True):
+                        try:
+                            y_off = 0.005
+                            if coxa_len > 0.0:
+                                txtc = self.ax.text(coxa_end[0], coxa_end[1], coxa_end[2]+y_off, f"C:{math.degrees(coxa_angle):.0f}°", fontsize=7, color='black')
+                                self.joint_texts.append(txtc)
+                            txtf = self.ax.text(femur_end[0], femur_end[1], femur_end[2]+y_off, f"F:{math.degrees(femur_angle):.0f}°", fontsize=7, color='black')
+                            txtt = self.ax.text(tibia_end[0], tibia_end[1], tibia_end[2]+y_off, f"T:{math.degrees(tibia_angle):.0f}°", fontsize=7, color='black')
+                            self.joint_texts.extend([txtf, txtt])
+                        except Exception:
+                            pass
     
     def _update_plot(self, frame):
         """Update the 3D plot with current data."""

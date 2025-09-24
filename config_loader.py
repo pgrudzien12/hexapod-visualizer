@@ -56,6 +56,11 @@ class LegConfig(BaseModel):
     name: str
     position: List[float] = Field(min_items=3, max_items=3)
     rotation: float
+    # Optional link lengths in meters: [coxa, femur, tibia]
+    # Backward compatibility: if only two values provided they are treated as [femur, tibia]
+    link_lengths: Optional[List[float]] = None  # [coxa, femur, tibia]
+    # Optional per-joint angle offsets (coxa, femur, tibia) in radians
+    joint_angle_offsets: List[float] = Field(default_factory=lambda: [0.0, 0.0, 0.0])
     
     @field_validator('position')
     @classmethod
@@ -71,6 +76,27 @@ class LegConfig(BaseModel):
         if abs(v) > 2 * math.pi:
             import warnings
             warnings.warn(f'Large rotation angle {v:.3f} rad ({math.degrees(v):.1f}°). Consider normalizing.')
+        return v
+    
+    @field_validator('link_lengths')
+    @classmethod
+    def validate_link_lengths(cls, v):
+        if v is None:
+            return v
+        if len(v) not in (2,3):
+            raise ValueError('link_lengths must have 2 or 3 values: [femur, tibia] or [coxa, femur, tibia]')
+        if any(l <= 0 for l in v):
+            raise ValueError('link_lengths values must be positive')
+        # Normalize to 3 elements (insert default coxa length if missing)
+        if len(v) == 2:
+            v = [0.0] + v  # coxa length unknown -> 0 (will be ignored in drawing)
+        return v
+    
+    @field_validator('joint_angle_offsets')
+    @classmethod
+    def validate_joint_angle_offsets(cls, v):
+        if len(v) != 3:
+            raise ValueError('joint_angle_offsets must have exactly 3 values [coxa, femur, tibia]')
         return v
 
 
@@ -106,10 +132,13 @@ class VisualizationConfig(BaseModel):
     show_body: bool = True
     show_legs: bool = True
     show_coordinates: bool = True
+    show_joints: bool = True
+    show_joint_angles: bool = True
     colors: Dict[str, List[int]] = {
         "body": [100, 100, 100],
         "legs": [50, 150, 200], 
-        "coordinates": [255, 0, 0]
+        "coordinates": [255, 0, 0],
+        "joints": [255, 215, 0]  # gold
     }
     
     @field_validator('colors')
@@ -211,12 +240,12 @@ class ConfigLoader:
                     'height': 0.050
                 },
                 'legs': {
-                    0: {'name': 'Left Front', 'position': [0.075, 0.075, 0.0], 'rotation': 0.7854},
-                    1: {'name': 'Left Middle', 'position': [0.0, 0.085, 0.0], 'rotation': 1.5708},
-                    2: {'name': 'Left Back', 'position': [-0.075, 0.075, 0.0], 'rotation': 2.3562},
-                    3: {'name': 'Right Front', 'position': [0.075, -0.075, 0.0], 'rotation': -0.7854},
-                    4: {'name': 'Right Middle', 'position': [0.0, -0.085, 0.0], 'rotation': -1.5708},
-                    5: {'name': 'Right Back', 'position': [-0.075, -0.075, 0.0], 'rotation': -2.3562}
+                    0: {'name': 'Left Front', 'position': [0.075, 0.075, 0.0], 'rotation': 0.7854, 'link_lengths': [0.068, 0.088, 0.127], 'joint_angle_offsets': [0.0, 0.5396943301595464, 1.0160719600939494]},
+                    1: {'name': 'Left Middle', 'position': [0.0, 0.085, 0.0], 'rotation': 1.5708, 'link_lengths': [0.068, 0.088, 0.127], 'joint_angle_offsets': [0.0, 0.5396943301595464, 1.0160719600939494]},
+                    2: {'name': 'Left Back', 'position': [-0.075, 0.075, 0.0], 'rotation': 2.3562, 'link_lengths': [0.068, 0.088, 0.127], 'joint_angle_offsets': [0.0, 0.5396943301595464, 1.0160719600939494]},
+                    3: {'name': 'Right Front', 'position': [0.075, -0.075, 0.0], 'rotation': -0.7854, 'link_lengths': [0.068, 0.088, 0.127], 'joint_angle_offsets': [0.0, 0.5396943301595464, 1.0160719600939494]},
+                    4: {'name': 'Right Middle', 'position': [0.0, -0.085, 0.0], 'rotation': -1.5708, 'link_lengths': [0.068, 0.088, 0.127], 'joint_angle_offsets': [0.0, 0.5396943301595464, 1.0160719600939494]},
+                    5: {'name': 'Right Back', 'position': [-0.075, -0.075, 0.0], 'rotation': -2.3562, 'link_lengths': [0.068, 0.088, 0.127], 'joint_angle_offsets': [0.0, 0.5396943301595464, 1.0160719600939494]}
                 }
             },
             'visualization': {
@@ -225,10 +254,13 @@ class ConfigLoader:
                 'show_body': True,
                 'show_legs': True,
                 'show_coordinates': True,
+                'show_joints': True,
+                'show_joint_angles': True,
                 'colors': {
                     'body': [100, 100, 100],
                     'legs': [50, 150, 200],
-                    'coordinates': [255, 0, 0]
+                    'coordinates': [255, 0, 0],
+                    'joints': [255, 215, 0]
                 }
             },
             'data': {

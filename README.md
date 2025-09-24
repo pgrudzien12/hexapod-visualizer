@@ -21,6 +21,7 @@ Real-time 3D visualization system for hexapod robot inverse kinematics data. Con
 - **Multiple view modes**: Toggle body, legs, and coordinate axes
 - **Mouse controls**: Rotate view by dragging, zoom with scroll wheel
 - **Keyboard shortcuts**: Quick access to display options and view reset
+ - **Joint chain rendering**: Visualizes coxa, femur, tibia segments with angle annotations
 
 ### 🎯 Demo Mode
 - **Simulated patterns**: Test visualization without robot connection
@@ -90,6 +91,8 @@ robot:
       name: "Left Front"
       position: [0.075, 0.075, 0.0]    # Attachment point [x,y,z]
       rotation: 0.7854                 # Rotation from X-axis (radians)
+      link_lengths: [0.068, 0.088, 0.127]  # [coxa, femur, tibia] lengths (m)
+      joint_angle_offsets: [0.0, 0.5396943301595464, 1.0160719600939494] # Calibration offsets (radians)
 ```
 
 ### Visualization Options
@@ -100,10 +103,13 @@ visualization:
   show_body: true       # Display body outline
   show_legs: true       # Display leg positions
   show_coordinates: true # Display coordinate axes
+  show_joints: true     # Draw articulated joint chain
+  show_joint_angles: true # Annotate joint angles (C/F/T)
   colors:               # RGB colors (0-255)
     body: [100, 100, 100]
     legs: [50, 150, 200]
     coordinates: [255, 0, 0]
+    joints: [255, 215, 0]
 ```
 
 ## Controls
@@ -134,6 +140,13 @@ Where:
 - `BodyXYZ`: 3D position in body coordinates (meters)
 - `LegXYZ`: 3D position in leg coordinates (meters)
 - `LegAng`: Servo angles (radians)
+
+### Joint Angles & Calibration
+Each leg reports raw servo angles: `(coxa, femur, tibia)` in radians. These are adjusted by `joint_angle_offsets` from the configuration to account for mechanical zero calibration:
+```
+effective_angle = raw_angle + offset
+```
+The visualized chain uses these effective angles. If only two `link_lengths` are provided, the system assumes a zero-length coxa for backward compatibility.
 
 ## Coordinate Systems
 
