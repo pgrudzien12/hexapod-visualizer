@@ -144,7 +144,7 @@ Where:
 ### Joint Angles & Calibration
 Each leg reports raw servo angles: `(coxa, femur, tibia)` in radians. These are adjusted by `joint_angle_offsets` from the configuration to account for mechanical zero calibration:
 ```
-effective_angle = raw_angle + offset
+effective_angle = raw_angle - offset  # Offsets represent mechanical zero bias
 ```
 The visualized chain uses these effective angles. If only two `link_lengths` are provided, the system assumes a zero-length coxa for backward compatibility.
 

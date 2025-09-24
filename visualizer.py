@@ -258,10 +258,10 @@ class HexapodVisualizer:
                     else:
                         coxa_len, femur_len, tibia_len = link_lengths[:3]
 
-                    # Apply calibrated offsets
-                    coxa_angle = leg_angles[0] + leg_cfg_model.joint_angle_offsets[0]
-                    femur_angle = leg_angles[1] + leg_cfg_model.joint_angle_offsets[1]
-                    tibia_angle = leg_angles[2] + leg_cfg_model.joint_angle_offsets[2]
+                    # Apply calibrated offsets (assume offsets represent mechanical zero so effective = raw - offset)
+                    coxa_angle = leg_angles[0] - leg_cfg_model.joint_angle_offsets[0]
+                    femur_angle = leg_angles[1] - leg_cfg_model.joint_angle_offsets[1]
+                    tibia_angle = leg_angles[2] - leg_cfg_model.joint_angle_offsets[2]
 
                     base_x, base_y, base_z = attach_pos
                     rot = leg_cfg_model.rotation
