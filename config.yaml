@@ -20,21 +20,21 @@ robot:
     # Left side legs (0, 1, 2)
     0:  # Left Front
       name: "Left Front"
-      position: [0.075, 0.075, 0.0]      # [x, y, z] attachment point in body coordinates (meters)
+      position: [0.08, 0.05, 0.0]        # Updated offsets: X front=+0.08, Y left=+0.05
       rotation: 0.7854                   # Rotation from body X-axis in radians (pi/4 = 45°)
       link_lengths: [0.068, 0.088, 0.127]   # [coxa, femur, tibia] lengths in meters
       joint_angle_offsets: [0.0, 0.5396943301595464, 1.0160719600939494]  # Offsets (coxa,femur,tibia)
       
     1:  # Left Middle  
       name: "Left Middle"
-      position: [0.0, 0.085, 0.0]        # [x, y, z] attachment point in body coordinates (meters)
+      position: [0.0, 0.05, 0.0]         # Middle X=0, left Y=+0.05
       rotation: 1.5708                   # Rotation from body X-axis in radians (pi/2 = 90°)
       link_lengths: [0.068, 0.088, 0.127]
       joint_angle_offsets: [0.0, 0.5396943301595464, 1.0160719600939494]
       
     2:  # Left Back
       name: "Left Back"
-      position: [-0.075, 0.075, 0.0]     # [x, y, z] attachment point in body coordinates (meters)
+      position: [-0.08, 0.05, 0.0]       # Rear X=-0.08, left Y=+0.05
       rotation: 2.3562                   # Rotation from body X-axis in radians (3*pi/4 = 135°)
       link_lengths: [0.068, 0.088, 0.127]
       joint_angle_offsets: [0.0, 0.5396943301595464, 1.0160719600939494]
@@ -42,21 +42,21 @@ robot:
     # Right side legs (3, 4, 5)  
     3:  # Right Front
       name: "Right Front"
-      position: [0.075, -0.075, 0.0]     # [x, y, z] attachment point in body coordinates (meters)
+      position: [0.08, -0.05, 0.0]       # Front X=+0.08, right Y=-0.05
       rotation: -0.7854                  # Rotation from body X-axis in radians (-pi/4 = -45°)
       link_lengths: [0.068, 0.088, 0.127]
       joint_angle_offsets: [0.0, 0.5396943301595464, 1.0160719600939494]
       
     4:  # Right Middle
       name: "Right Middle" 
-      position: [0.0, -0.085, 0.0]       # [x, y, z] attachment point in body coordinates (meters)
+      position: [0.0, -0.05, 0.0]        # Middle X=0, right Y=-0.05
       rotation: -1.5708                  # Rotation from body X-axis in radians (-pi/2 = -90°)
       link_lengths: [0.068, 0.088, 0.127]
       joint_angle_offsets: [0.0, 0.5396943301595464, 1.0160719600939494]
       
     5:  # Right Back
       name: "Right Back"
-      position: [-0.075, -0.075, 0.0]    # [x, y, z] attachment point in body coordinates (meters)
+      position: [-0.08, -0.05, 0.0]      # Rear X=-0.08, right Y=-0.05
       rotation: -2.3562                  # Rotation from body X-axis in radians (-3*pi/4 = -135°)
       link_lengths: [0.068, 0.088, 0.127]
       joint_angle_offsets: [0.0, 0.5396943301595464, 1.0160719600939494]
