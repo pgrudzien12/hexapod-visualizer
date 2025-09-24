@@ -1,0 +1,62 @@
+# Example Hexapod Configuration - Compact Layout
+# Configuration for a smaller, more compact hexapod design
+
+serial:
+  port: "COM4"
+  baudrate: 115200
+  timeout: 0.5          # Shorter timeout for faster response
+
+robot:
+  body:
+    length: 0.120       # Compact robot
+    width: 0.080        
+    height: 0.030       
+
+  # Compact leg layout with minimal rotations
+  legs:
+    0:  # Left Front
+      name: "L1"
+      position: [0.050, 0.045, 0.0]      # Closer to body
+      rotation: 0.5236                   # 30° (pi/6)
+      
+    1:  # Left Middle  
+      name: "L2"
+      position: [0.0, 0.050, 0.0]        # Straight out
+      rotation: 1.5708                   # 90°
+      
+    2:  # Left Back
+      name: "L3"
+      position: [-0.050, 0.045, 0.0]     # Symmetric to front
+      rotation: 2.6180                   # 150° (5*pi/6)
+
+    3:  # Right Front
+      name: "R1"
+      position: [0.050, -0.045, 0.0]     
+      rotation: -0.5236                  # -30°
+      
+    4:  # Right Middle
+      name: "R2" 
+      position: [0.0, -0.050, 0.0]       
+      rotation: -1.5708                  # -90°
+      
+    5:  # Right Back
+      name: "R3"
+      position: [-0.050, -0.045, 0.0]    
+      rotation: -2.6180                  # -150°
+
+visualization:
+  update_rate: 120      # High frame rate for responsiveness
+  buffer_size: 50       # Small buffer for low latency
+  show_body: true
+  show_legs: true
+  show_coordinates: true
+  colors:
+    body: [150, 150, 150]   # Light gray
+    legs: [100, 200, 100]   # Light green
+    coordinates: [255, 255, 0]  # Yellow
+
+data:
+  coordinate_system: "right_hand"
+  units: "meters"
+  enable_smoothing: false   # No smoothing for raw data
+  smoothing_window: 1

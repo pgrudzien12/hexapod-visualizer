@@ -1,0 +1,77 @@
+# Hexapod Visualizer Configuration File
+
+# Serial Communication Settings
+serial:
+  port: "COM5"          # Serial port to connect to
+  baudrate: 115200      # Baud rate for serial communication
+  timeout: 1.0          # Read timeout in seconds
+
+# Robot Physical Configuration
+robot:
+  # Body dimensions (for reference, not used in calculations)
+  body:
+    length: 0.200       # Body length in meters (front to back)
+    width: 0.150        # Body width in meters (left to right)
+    height: 0.050       # Body height in meters
+
+  # Leg Configuration (6 legs total)
+  # Each leg defined by its attachment point in body coordinates and rotation
+  legs:
+    # Left side legs (0, 1, 2)
+    0:  # Left Front
+      name: "Left Front"
+      position: [0.075, 0.075, 0.0]      # [x, y, z] attachment point in body coordinates (meters)
+      rotation: 0.7854                   # Rotation from body X-axis in radians (pi/4 = 45°)
+      
+    1:  # Left Middle  
+      name: "Left Middle"
+      position: [0.0, 0.085, 0.0]        # [x, y, z] attachment point in body coordinates (meters)
+      rotation: 1.5708                   # Rotation from body X-axis in radians (pi/2 = 90°)
+      
+    2:  # Left Back
+      name: "Left Back"
+      position: [-0.075, 0.075, 0.0]     # [x, y, z] attachment point in body coordinates (meters)
+      rotation: 2.3562                   # Rotation from body X-axis in radians (3*pi/4 = 135°)
+
+    # Right side legs (3, 4, 5)  
+    3:  # Right Front
+      name: "Right Front"
+      position: [0.075, -0.075, 0.0]     # [x, y, z] attachment point in body coordinates (meters)
+      rotation: -0.7854                  # Rotation from body X-axis in radians (-pi/4 = -45°)
+      
+    4:  # Right Middle
+      name: "Right Middle" 
+      position: [0.0, -0.085, 0.0]       # [x, y, z] attachment point in body coordinates (meters)
+      rotation: -1.5708                  # Rotation from body X-axis in radians (-pi/2 = -90°)
+      
+    5:  # Right Back
+      name: "Right Back"
+      position: [-0.075, -0.075, 0.0]    # [x, y, z] attachment point in body coordinates (meters)
+      rotation: -2.3562                  # Rotation from body X-axis in radians (-3*pi/4 = -135°)
+
+# Visualization Settings
+visualization:
+  # Real-time display settings
+  update_rate: 60       # Target FPS for visualization updates
+  buffer_size: 100      # Number of recent data points to keep in memory
+  
+  # Display options
+  show_body: true       # Show robot body outline
+  show_legs: true       # Show leg positions and orientations
+  show_coordinates: true # Show coordinate system axes
+  
+  # Colors (RGB values 0-255)
+  colors:
+    body: [100, 100, 100]
+    legs: [50, 150, 200]
+    coordinates: [255, 0, 0]
+
+# Data Processing Settings
+data:
+  # Coordinate system transformations
+  coordinate_system: "right_hand"  # "right_hand" or "left_hand"
+  units: "meters"                  # "meters" or "millimeters"
+  
+  # Filtering options
+  enable_smoothing: false          # Apply smoothing filter to data
+  smoothing_window: 5              # Number of samples for moving average (if enabled)

@@ -1,0 +1,76 @@
+data:
+  coordinate_system: right_hand
+  enable_smoothing: false
+  smoothing_window: 5
+  units: meters
+robot:
+  body:
+    height: 0.05
+    length: 0.2
+    width: 0.15
+  legs:
+    0:
+      name: Left Front
+      position:
+      - 0.075
+      - 0.075
+      - 0.0
+      rotation: 0.7854
+    1:
+      name: Left Middle
+      position:
+      - 0.0
+      - 0.085
+      - 0.0
+      rotation: 1.5708
+    2:
+      name: Left Back
+      position:
+      - -0.075
+      - 0.075
+      - 0.0
+      rotation: 2.3562
+    3:
+      name: Right Front
+      position:
+      - 0.075
+      - -0.075
+      - 0.0
+      rotation: -0.7854
+    4:
+      name: Right Middle
+      position:
+      - 0.0
+      - -0.085
+      - 0.0
+      rotation: -1.5708
+    5:
+      name: Right Back
+      position:
+      - -0.075
+      - -0.075
+      - 0.0
+      rotation: -2.3562
+serial:
+  baudrate: 115200
+  port: COM5
+  timeout: 1.0
+visualization:
+  buffer_size: 100
+  colors:
+    body:
+    - 100
+    - 100
+    - 100
+    coordinates:
+    - 255
+    - 0
+    - 0
+    legs:
+    - 50
+    - 150
+    - 200
+  show_body: true
+  show_coordinates: true
+  show_legs: true
+  update_rate: 60

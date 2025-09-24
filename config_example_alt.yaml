@@ -1,0 +1,69 @@
+# Example Hexapod Configuration - Alternative Layout
+# This configuration demonstrates a hexapod with different leg positioning and rotations
+
+# Serial Communication Settings
+serial:
+  port: "COM3"          # Different port for testing
+  baudrate: 921600      # Higher baud rate
+  timeout: 2.0          # Longer timeout
+
+# Robot Physical Configuration
+robot:
+  # Body dimensions
+  body:
+    length: 0.250       # Larger robot
+    width: 0.180        
+    height: 0.060       
+
+  # Leg Configuration - More spread out layout
+  legs:
+    # Left side legs
+    0:  # Left Front
+      name: "LF"
+      position: [0.100, 0.090, 0.0]      # Further forward and out
+      rotation: 1.0472                   # 60° from X-axis (pi/3)
+      
+    1:  # Left Middle  
+      name: "LM"
+      position: [0.0, 0.100, 0.0]        # Wider spacing
+      rotation: 1.5708                   # 90° from X-axis
+      
+    2:  # Left Back
+      name: "LB"
+      position: [-0.100, 0.090, 0.0]     # Further back and out
+      rotation: 2.0944                   # 120° from X-axis (2*pi/3)
+
+    # Right side legs
+    3:  # Right Front
+      name: "RF"
+      position: [0.100, -0.090, 0.0]     
+      rotation: -1.0472                  # -60° from X-axis
+      
+    4:  # Right Middle
+      name: "RM" 
+      position: [0.0, -0.100, 0.0]       
+      rotation: -1.5708                  # -90° from X-axis
+      
+    5:  # Right Back
+      name: "RB"
+      position: [-0.100, -0.090, 0.0]    
+      rotation: -2.0944                  # -120° from X-axis
+
+# Visualization Settings  
+visualization:
+  update_rate: 30       # Lower frame rate
+  buffer_size: 200      # Larger buffer
+  show_body: true
+  show_legs: true
+  show_coordinates: false   # Hide coordinate system
+  colors:
+    body: [80, 80, 80]      # Darker body
+    legs: [255, 100, 50]    # Orange legs
+    coordinates: [0, 255, 0] # Green coordinates
+
+# Data Processing Settings
+data:
+  coordinate_system: "right_hand"
+  units: "meters"
+  enable_smoothing: true    # Enable smoothing
+  smoothing_window: 3       # Smaller window
