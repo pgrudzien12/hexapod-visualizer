@@ -2,6 +2,7 @@
 
 Real-time 3D visualization system for hexapod robot inverse kinematics data. Connects to serial port to receive live data and displays the robot in 3D with configurable visualization options.
 
+![visualization](./img/demo.png)
 ## Features
 
 ### 🔧 Configuration System
