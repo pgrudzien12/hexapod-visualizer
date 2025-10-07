@@ -14,7 +14,7 @@ import math
 from typing import Optional, List, Tuple, Dict
 from dataclasses import dataclass, field
 
-from main import SerialReader, LegData
+from serial_reader import SerialReader, LegData
 from config_loader import ConfigLoader, HexapodConfig
 
 

@@ -58,8 +58,8 @@ Real-time 3D visualization system for hexapod robot inverse kinematics data. Con
 ### Live Visualization (with robot)
 ```bash
 # Connect to robot and visualize real-time data
-python main.py        # Text-based parser only
-python visualizer.py  # 3D visualization
+python serial_reader.py        # Text-based parser only
+python visualizer.py           # 3D visualization
 ```
 
 ### Demo Mode (without robot)

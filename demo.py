@@ -12,7 +12,7 @@ import threading
 from typing import Optional
 
 from visualizer import HexapodVisualizer, HexapodState
-from main import LegData
+from serial_reader import LegData
 from config_loader import ConfigLoader, LegConfiguration
 
 
